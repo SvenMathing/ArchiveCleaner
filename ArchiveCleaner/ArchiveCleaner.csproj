@@ -79,6 +79,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ArchiveCleaner_Form.de-DE.resx">
+      <DependentUpon>ArchiveCleaner_Form.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ArchiveCleaner_Form.resx">
       <DependentUpon>ArchiveCleaner_Form.cs</DependentUpon>
     </EmbeddedResource>

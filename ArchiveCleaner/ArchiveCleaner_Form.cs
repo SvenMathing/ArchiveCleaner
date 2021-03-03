@@ -10,13 +10,8 @@
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ArchiveCleaner
@@ -48,7 +43,7 @@ namespace ArchiveCleaner
         /// <param name="e"></param>
         private void SelectPathButton_Click(object sender, EventArgs e)
         {
-            
+
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             DialogResult result = dialog.ShowDialog();
             if (result.Equals(DialogResult.OK))
@@ -68,10 +63,29 @@ namespace ArchiveCleaner
             if (PathTextBox.Text.Length > 0 && DateTextBox.Text.Length > 0)
             {
                 //date and path are filled
-
+                //clear the Listbox
+                FilesListBox.Items.Clear();
+                StatusLabel.Text = "";
+                //search for files
+                SearchFilesQueue();
+            }
+            else
+            {
+                MessageBox.Show("Bitte zuerst ein Verzeichnis und ein Datum wählen!");
+                return;
+            }
+        }
+        /// <summary>
+        /// starts the search for files which fullfill the search criteria
+        /// </summary>
+        private void SearchFiles_oldway()
+        {
+            if (PathTextBox.Text.Length > 0 && DateTextBox.Text.Length > 0)
+            {
+                //date and path are filled
+                Console.WriteLine("Timestep: " + DateTime.Now);
                 //recursive search for files 
                 string[] allFiles = Directory.GetFiles(PathTextBox.Text, "*.*", System.IO.SearchOption.AllDirectories);
-                //MessageBox.Show("There are " + allFiles.Length + " files..."+ allFiles[0]+ " " + File.GetCreationTime(allFiles[0]));
 
                 //now go through the list and find the one older than the date
                 List<string> filesToDelete = new List<string>();
@@ -88,12 +102,155 @@ namespace ArchiveCleaner
                         FilesListBox.Items.Add(file);
                     }
                 }
+                Console.WriteLine("Timestep: " + DateTime.Now);
                 MessageBox.Show("Es gibt " + filesToDelete.Count + " Dateien, die den Suchparametern entsprechen!");
             }
             else
             {
                 MessageBox.Show("Bitte zuerst ein Verzeichnis und ein Datum wählen!");
                 return;
+            }
+        }
+
+
+        /// <summary>
+        /// starts the search for files which fullfill the search criteria
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SearchFiles()
+        {
+            if (PathTextBox.Text.Length > 0 && DateTextBox.Text.Length > 0)
+            {
+                DateTime searchDate = DateTime.Parse(DateTextBox.Text);
+                //date and path are filled
+                try
+                {
+                    Console.WriteLine("Timestep: " + DateTime.Now);
+                    int fCount = Directory.EnumerateFiles(PathTextBox.Text, "*", System.IO.SearchOption.AllDirectories).Count();
+                    Console.WriteLine("Timestep: " + DateTime.Now);
+                    MessageBox.Show("Es müssen " + fCount + " Verzeichnisse durchsucht werden! Das kann lange dauern (vor allem bei Netzwerklaufwerken!");
+
+                    //search for files 
+                    Console.WriteLine("Timestep: " + DateTime.Now);
+                    var allFiles = from file in
+                        Directory.EnumerateFiles(@PathTextBox.Text, "*", System.IO.SearchOption.AllDirectories)
+                                   where ((File.GetCreationTime(file)) < searchDate)
+                                   select file;
+                    foreach (var file in allFiles)
+                    {
+                        //Console.WriteLine("{0}", file);
+                        FilesListBox.Items.Add(file);
+                    }
+                }
+                catch (UnauthorizedAccessException UAEx)
+                {
+                    Console.WriteLine(UAEx.Message);
+                }
+                catch (PathTooLongException PathEx)
+                {
+                    Console.WriteLine(PathEx.Message);
+                }
+
+                Console.WriteLine("Timestep: " + DateTime.Now);
+
+                MessageBox.Show(String.Format("Es gibt {0} Dateien, die den Suchparametern entsprechen.", FilesListBox.Items.Count));
+            }
+            else
+            {
+                MessageBox.Show("Bitte zuerst ein Verzeichnis und ein Datum wählen!");
+                return;
+            }
+        }
+
+        private void SearchFilesQueue()
+        {
+            if (PathTextBox.Text.Length > 0 && DateTextBox.Text.Length > 0)
+            {
+                StatusLabel.Text = "Zähle Dateien... Das kann sehr lange dauern...";
+                StatusLabel.Update();
+
+                //get the list of files. This can be run for a long! time..
+                IEnumerable<string> files = EnumerateFiles(PathTextBox.Text);
+
+                DateTime fileCreationDate;
+                DateTime searchDate = DateTime.Parse(DateTextBox.Text);
+                int counter = 0;
+                int lastTick = 0;
+                int amount = files.Count<string>();
+                foreach (var file in files)
+                {
+                    counter++;
+                    //Console.WriteLine(file);
+                    //fileCreationDate = File.GetCreationTime(file);
+                    FileSystemInfo fsi = new FileInfo(file);
+                    fileCreationDate = fsi.CreationTime;
+                    // System.IO.DirectoryInfo.EnumerateFiles(file) ;//.Crea;
+                    if (fileCreationDate < searchDate)
+                    {
+                        if (FilesListBox.Items.Count == lastTick)
+                        {
+                            //Console.WriteLine(lastTick+" Dateien gefunden...");
+                            StatusLabel.Text = counter + " / "+ amount + " Dateien durchsucht und "+ lastTick + " alte Dateien gefunden";
+                            StatusLabel.Update();
+                            FilesListBox.Update();
+                            lastTick += 100;
+                        }
+                        
+                        FilesListBox.Items.Add(file);
+                    }
+                }
+                StatusLabel.Text = FilesListBox.Items.Count + " Dateien gefunden";
+                StatusLabel.Update();
+                MessageBox.Show("Es gibt " + FilesListBox.Items.Count + " Dateien, die den Suchparametern entsprechen!");
+                StatusLabel1.Text = "";
+                StatusLabel1.Update();
+
+            }
+        }
+
+        internal IEnumerable<string> EnumeratePaths(string root)
+        {
+            if (root == null)
+                throw new ArgumentNullException("root");
+            if (!Directory.Exists(root))
+                throw new ArgumentException("Invalid root path", "root");
+
+            if (root.Length > 3)
+                root = Path.GetDirectoryName(root + "\\");
+
+            Queue<string> queue = new Queue<string>();
+            queue.Enqueue(root);
+
+            while (queue.Count > 0)
+            {
+                string curr = queue.Dequeue();
+                bool failed = false;
+                StatusLabel1.Text = "bearbeite Verzeichnis: " + curr;
+                StatusLabel1.Update();
+                try
+                {
+                    foreach (var path in Directory.GetDirectories(curr))
+                    {
+                        queue.Enqueue(path);
+                    }
+                }
+                catch
+                {
+                    failed = true;
+                }
+                if (!failed)
+                    yield return curr;
+            }
+        }
+
+        internal IEnumerable<string> EnumerateFiles(string root)
+        {
+            var paths = EnumeratePaths(root);
+            foreach (var nxt in paths)
+            {
+                foreach (var filename in Directory.GetFiles(nxt)) //EnumerateFiles(nxt))
+                    yield return filename;
             }
         }
 
@@ -109,7 +266,7 @@ namespace ArchiveCleaner
             int filecount = FilesListBox.Items.Count;
             if (filesToDelete.Count > 0)
             {
-                if (MessageBox.Show("Wollen Sie wirklich "+filecount+" Datei(en) und Verzeichnisse löschen?", "Warnung", MessageBoxButtons.YesNo, MessageBoxIcon.Stop).Equals(DialogResult.Yes))
+                if (MessageBox.Show("Wollen Sie wirklich " + filecount + " Datei(en) und Verzeichnisse löschen?", "Warnung", MessageBoxButtons.YesNo, MessageBoxIcon.Stop).Equals(DialogResult.Yes))
                 {
                     //YES...delete the files
                     if (MessageBox.Show("Wollen Sie wirklich löschen? " + Environment.NewLine
@@ -129,6 +286,7 @@ namespace ArchiveCleaner
                 }
             }
         }
+        
 
         /// <summary>
         /// deletes all selected files from the listbox
@@ -171,13 +329,13 @@ namespace ArchiveCleaner
         /// </summary>
         /// <param name="filename">the file with complete path to delete</param>
         private void DeleteFileAndFolder(string filename)
-        {            
+        {
             string folder = System.IO.Path.GetDirectoryName(filename);
 
             //try to delete the file and then the folder
             try
             {
-                Console.Write("Lösche Datei " + filename+ " ... ");
+                Console.Write("Lösche Datei " + filename + " ... ");
                 //deleting without trash bin
                 //File.Delete(filename);    
 
@@ -187,17 +345,19 @@ namespace ArchiveCleaner
                 Console.WriteLine("fertig!");
                 //lösche EIntrag aus der Listbox
                 FilesListBox.Items.Remove(filename);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 //error deleting the file
-                Console.WriteLine("Datei konnte nicht gelöscht werden ["+ex.Message+"]");
+                Console.WriteLine("Datei konnte nicht gelöscht werden [" + ex.Message + "]");
             }
-            
+
             //delete the folder if it is empty
             Console.Write(String.Format("Verzeichnis {0} ", folder));
             if (IsEmpty(folder))
             {
-                try {
+                try
+                {
                     Console.Write("ist leer und wird gelöscht... ");
                     //deleting without trash bin
                     //Directory.Delete(folder); 
