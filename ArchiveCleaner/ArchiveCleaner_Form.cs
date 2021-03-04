@@ -24,6 +24,7 @@ namespace ArchiveCleaner
 
             //default timespan is 10 years back
             DateTextBox.Text = new DateTime((DateTime.Today.Year) - 10, 1, 1).ToShortDateString();
+            CopyRightLabel.Text = "(c) 2021 Sven Mathing, v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
         /// <summary>
@@ -426,7 +427,7 @@ namespace ArchiveCleaner
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             // Specify that the link was visited.
-            this.linkLabel1.LinkVisited = true;
+            this.LicenceLinkLabel.LinkVisited = true;
 
             // Navigate to a URL.
             System.Diagnostics.Process.Start("https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12");
@@ -440,7 +441,7 @@ namespace ArchiveCleaner
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             // Specify that the link was visited.
-            this.linkLabel1.LinkVisited = true;
+            this.LicenceLinkLabel.LinkVisited = true;
 
             // Navigate to a URL.
             System.Diagnostics.Process.Start("https://github.com/SvenMathing/ArchiveCleaner");

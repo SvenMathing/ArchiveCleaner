@@ -41,9 +41,9 @@ namespace ArchiveCleaner
             this.DeleteAllButton = new System.Windows.Forms.Button();
             this.DeleteSelectedButton = new System.Windows.Forms.Button();
             this.CloseProgramButton = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.CopyRightLabel = new System.Windows.Forms.Label();
+            this.LicenceLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.SourceCodeLinkLabel = new System.Windows.Forms.LinkLabel();
             this.StatusLabel = new System.Windows.Forms.Label();
             this.StatusLabel1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
@@ -123,24 +123,24 @@ namespace ArchiveCleaner
             this.CloseProgramButton.UseVisualStyleBackColor = true;
             this.CloseProgramButton.Click += new System.EventHandler(this.CloseProgramButton_Click);
             // 
-            // label3
+            // CopyRightLabel
             // 
-            resources.ApplyResources(this.label3, "label3");
-            this.label3.Name = "label3";
+            resources.ApplyResources(this.CopyRightLabel, "CopyRightLabel");
+            this.CopyRightLabel.Name = "CopyRightLabel";
             // 
-            // linkLabel1
+            // LicenceLinkLabel
             // 
-            resources.ApplyResources(this.linkLabel1, "linkLabel1");
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            resources.ApplyResources(this.LicenceLinkLabel, "LicenceLinkLabel");
+            this.LicenceLinkLabel.Name = "LicenceLinkLabel";
+            this.LicenceLinkLabel.TabStop = true;
+            this.LicenceLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
-            // linkLabel2
+            // SourceCodeLinkLabel
             // 
-            resources.ApplyResources(this.linkLabel2, "linkLabel2");
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
+            resources.ApplyResources(this.SourceCodeLinkLabel, "SourceCodeLinkLabel");
+            this.SourceCodeLinkLabel.Name = "SourceCodeLinkLabel";
+            this.SourceCodeLinkLabel.TabStop = true;
+            this.SourceCodeLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
             // 
             // StatusLabel
             // 
@@ -158,10 +158,10 @@ namespace ArchiveCleaner
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.StatusLabel1);
             this.Controls.Add(this.StatusLabel);
-            this.Controls.Add(this.linkLabel2);
-            this.Controls.Add(this.linkLabel1);
+            this.Controls.Add(this.SourceCodeLinkLabel);
+            this.Controls.Add(this.LicenceLinkLabel);
             this.Controls.Add(this.CloseProgramButton);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.CopyRightLabel);
             this.Controls.Add(this.DeleteSelectedButton);
             this.Controls.Add(this.DeleteAllButton);
             this.Controls.Add(this.FilesListBox);
@@ -187,9 +187,9 @@ namespace ArchiveCleaner
         private System.Windows.Forms.Button DeleteAllButton;
         private System.Windows.Forms.Button DeleteSelectedButton;
         private System.Windows.Forms.Button CloseProgramButton;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.LinkLabel linkLabel1;
-        private System.Windows.Forms.LinkLabel linkLabel2;
+        private System.Windows.Forms.Label CopyRightLabel;
+        private System.Windows.Forms.LinkLabel LicenceLinkLabel;
+        private System.Windows.Forms.LinkLabel SourceCodeLinkLabel;
         private System.Windows.Forms.Label StatusLabel1;
         internal System.Windows.Forms.Label StatusLabel;
     }
